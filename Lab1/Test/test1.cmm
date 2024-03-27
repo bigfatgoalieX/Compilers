@@ -1,5 +1,7 @@
 int main()
 {
+	_testid = 111.1 + 90;
 	int i = 1;
 	int j = 2;
+	float k = 0.98;
 }

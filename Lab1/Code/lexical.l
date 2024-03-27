@@ -1,9 +1,15 @@
+%option yylineno
 
 DIGIT [0-9] 
-LETTER [_a-zA-Z]
-WS [ \t\r\n] 
+LETTER_ [_a-zA-Z]
+WHITESPACE [ \t\r\n]+
+INT [+-]?{DIGIT}+
+FLOAT [+-]?{DIGIT}+\.?{DIGIT}+
+ID {LETTER_}({LETTER_}|{DIGIT})*
 
 %%
+
+{WHITESPACE} {;}
 ";" {
     printf("SEMI\n");
     // return SEMI;
@@ -100,10 +106,20 @@ WS [ \t\r\n]
     printf("WHILE\n"); 
     // return WHILE; 
     }
-{WS}+ {;}
+{INT} {
+    printf("INT\n");
+    // return INT;
+}
+{FLOAT} {
+    printf("FLOAT\n");
+    // return FLOAT;
+}
+{ID} {
+    printf("ID\n");
+    // return ID;
+}
 . { 
-    printf("ERROR\n");
-    // printf("Error type A at Line %d: Mysterious characters \'%s\'\n",
-    // yylinenno, yytext);
+    printf("Error type A at Line %d: Mysterious characters \'%s\'\n",
+    yylineno, yytext);
     }
 %%

@@ -83,6 +83,7 @@ Tag: ID{
 
 /* Declarators */
 VarDec: ID{
+    printf("first line :%d\n",(@1).first_line);
     };
     | VarDec LB INT RB{
     };

@@ -1,7 +1,6 @@
 int main()
 {
-	int ~ = 8;
 	int i = 1;
-	int j = 2;
-	float k = 0.98;
+	int j = ~i;
+	k[1,3] = 0;
 }

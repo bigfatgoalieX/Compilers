@@ -1,5 +1,10 @@
 %option yylineno
 
+%{
+    #include"stdio.h"
+    #include "syntax.tab.h"
+%}
+
 DIGIT [0-9] 
 LETTER_ [_a-zA-Z]
 WHITESPACE [ \t\r\n]+
@@ -11,112 +16,112 @@ ID {LETTER_}({LETTER_}|{DIGIT})*
 
 {WHITESPACE} {;}
 ";" {
-    printf("SEMI\n");
-    // return SEMI;
+    // printf("SEMI\n");
+    return SEMI;
     }
 "," { 
-    printf("COMMA\n"); 
-    // return COMMA;
+    // printf("COMMA\n"); 
+    return COMMA;
     }
 "=" { 
-    printf("ASSIGNOP\n"); 
-    // return ASSIGNOP; 
+    // printf("ASSIGNOP\n"); 
+    return ASSIGNOP; 
     }
 >|<|>=|<=|==|!= { 
-    printf("RELOP\n"); 
-    // return RELOP; 
+    // printf("RELOP\n"); 
+    return RELOP; 
     }
 "+" { 
-    printf("PLUS\n"); 
-    // return PLUS; 
+    // printf("PLUS\n"); 
+    return PLUS; 
     }
 "-" { 
-    printf("MINUS\n"); 
-    // return MINUS; 
+    // printf("MINUS\n"); 
+    return MINUS; 
     }
 "*" { 
-    printf("STAR\n"); 
-    // return STAR; 
+    // printf("STAR\n"); 
+    return STAR; 
     }
 "/" { 
-    printf("DIV\n"); 
-    // return DIV; 
+    // printf("DIV\n"); 
+    return DIV; 
     }
 "&&" { 
-    printf("AND\n"); 
-    // return AND; 
+    // printf("AND\n"); 
+    return AND; 
     }
 "||" { 
-    printf("OR\n"); 
-    // return OR; 
+    // printf("OR\n"); 
+    return OR; 
     }
 "." { 
-    printf("DOT\n"); 
-    // return DOT; 
+    // printf("DOT\n"); 
+    return DOT; 
     }
 "!" { 
-    printf("NOT\n"); 
-    // return NOT; 
+    // printf("NOT\n"); 
+    return NOT; 
     }
 "int"|"float" { 
-    printf("TYPE\n"); 
-    // return TYPE; 
+    // printf("TYPE\n"); 
+    return TYPE; 
     }
 "(" { 
-    printf("LP\n"); 
-    // return LP; 
+    // printf("LP\n"); 
+    return LP; 
     }
 ")" { 
-    printf("RP\n"); 
-    // return RP; 
+    // printf("RP\n"); 
+    return RP; 
     }
 "[" { 
-    printf("LB\n"); 
-    // return LB; 
+    // printf("LB\n"); 
+    return LB; 
     }
 "]" { 
-    printf("RB\n"); 
-    // return RB; 
+    // printf("RB\n"); 
+    return RB; 
     }
 "{" { 
-    printf("LC\n"); 
-    // return LC; 
+    // printf("LC\n"); 
+    return LC; 
     }
 "}" { 
-    printf("RC\n"); 
-    // return RC; 
+    // printf("RC\n"); 
+    return RC; 
     }
 "struct" { 
-    printf("STRUCT\n"); 
-    // return STRUCT; 
+    // printf("STRUCT\n"); 
+    return STRUCT; 
     }
 "return" { 
-    printf("RETURN\n"); 
-    // return RETURN; 
+    // printf("RETURN\n"); 
+    return RETURN; 
     }
 "if" { 
-    printf("IF\n"); 
-    // return IF; 
+    // printf("IF\n"); 
+    return IF; 
     }
 "else" { 
-    printf("ELSE\n"); 
-    // return ELSE; 
+    // printf("ELSE\n"); 
+    return ELSE; 
     }
 "while" { 
-    printf("WHILE\n"); 
-    // return WHILE; 
+    // printf("WHILE\n"); 
+    return WHILE; 
     }
 {INT} {
-    printf("INT\n");
-    // return INT;
+    // printf("INT\n");
+    return INT;
 }
 {FLOAT} {
-    printf("FLOAT\n");
-    // return FLOAT;
+    // printf("FLOAT\n");
+    return FLOAT;
 }
 {ID} {
-    printf("ID\n");
-    // return ID;
+    // printf("ID\n");
+    return ID;
 }
 . { 
     printf("Error type A at Line %d: Mysterious characters \'%s\'\n",

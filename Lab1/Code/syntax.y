@@ -4,6 +4,7 @@
 #include "syntax.tab.h"
 #include "lex.yy.c"
 #include "tree.h"
+#include "semantic.h"
 
 // extern struct ASTNode;
 Node *root; //the root of the AST
@@ -457,7 +458,12 @@ int main(int argc, char** argv)
     yyrestart(f);
     yyparse();
     if(err_cnt == 0){
-        preorder_traversal_AST(root);
+        // preorder_traversal_AST(root);
+        ListNode* headnode = (ListNode*)malloc(sizeof(ListNode));
+        headnode -> name = (char*)malloc(sizeof(char));//如果可能触及到的指针，都必须初始化。否则segfault
+        ListNode* tailnode = headnode;
+        // printf("syntax good\n");
+        ASTtraversal(root,headnode,&tailnode);
     }
     return 0;
 }

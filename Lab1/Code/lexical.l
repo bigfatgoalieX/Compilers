@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "syntax.tab.h"
 #include "tree.h"
+#include "semantic.h"
 
 // extern Node *bison_create_node(NodeType type, char* type_name);
 // extern enum ASTNodeType;

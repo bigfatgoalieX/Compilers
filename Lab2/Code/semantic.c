@@ -1,8 +1,6 @@
 #include "semantic.h"
 #include "tree.h"
 // 运行时维护头指针head和尾指针tail
-
-// 给链表中插入结点
 void insertSymbol(char* name, T type, ListNode** ptail) {
     // printf("$$$\n");
     ListNode* newNode = (ListNode*)malloc(sizeof(ListNode));
@@ -15,7 +13,6 @@ void insertSymbol(char* name, T type, ListNode** ptail) {
     (*ptail) -> next = newNode;
     *ptail = newNode; //其实没改变tail的值
 }
-
 // 找到链表中的某个结点
 ListNode* findSymbol(char* name, ListNode* head){
     ListNode* current = head;
@@ -28,12 +25,12 @@ ListNode* findSymbol(char* name, ListNode* head){
     return NULL; // 没有找到匹配的标识符
 }
 
-// 打印错误信息
+//打印错误信息
 void print_error(int error_type, int line){
     printf("Error type %d at Line %d:\n",error_type,line);
 }
 
-// 填链表
+//填表
 void fill_symboltable(struct ASTNode* astnode, ListNode** ptail){
     // printf("***\n");
     if(astnode == NULL){
@@ -55,8 +52,7 @@ void fill_symboltable(struct ASTNode* astnode, ListNode** ptail){
             }
         }
         if(astnode -> type == ID_TYPE){
-            printf("%s",astnode -> data.stringval);
-            // if(findSymbol(astnode -> data.stringval, ))
+            // printf("%s",astnode -> data.stringval);
             insertSymbol(astnode -> data.stringval,type,ptail);
         }
 
@@ -68,7 +64,7 @@ void fill_symboltable(struct ASTNode* astnode, ListNode** ptail){
             /* code */
         }else{
             if(astnode -> type == ID_TYPE){
-                printf("%s",astnode -> data.stringval);
+                // printf("%s",astnode -> data.stringval);
                 insertSymbol(astnode -> data.stringval,type,ptail);
             }
             
@@ -90,16 +86,16 @@ void fill_symboltable(struct ASTNode* astnode, ListNode** ptail){
     fill_symboltable(astnode -> next_sib,ptail);    
 }
 
-// 查链表
+//查表
 void check_symboltable(struct ASTNode* astnode, ListNode* head){
     if(astnode == NULL){
         return;
     }
     if(astnode -> first_child == NULL){
         // 如果是叶子结点
-        printf("flag\n");
+        // printf("flag\n");
         if(astnode -> type == ID_TYPE){
-            printf("***\n");
+            // printf("***\n");
             if(findSymbol(astnode -> data.stringval,head) == NULL){
                 print_error(1,4);
                 // exit(0);
@@ -125,7 +121,7 @@ void ASTtraversal(struct ASTNode* root, ListNode* head, ListNode** ptail){
         // printf("###\n");
     }
     if(root -> type == EXP){
-        printf("#\n");
+        // printf("#\n");
         // 查表
         // 查表时候，该填写的项一定已经被填写了吗？ 若否，似乎查表应该重新遍历
         check_symboltable(root,head);

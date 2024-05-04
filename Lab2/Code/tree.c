@@ -45,7 +45,7 @@ Node *flex_create_node(NodeType type, char* type_name, int line) {
         node->lineno = line;
     }
 }
-
+// 前序遍历语法树
 void preorder_traversal_AST(Node* root){
     if(root == NULL){
         return;
@@ -56,3 +56,21 @@ void preorder_traversal_AST(Node* root){
     preorder_traversal_AST(root -> first_child);
     preorder_traversal_AST(root -> next_sib);
 }
+
+// 获取某个父节点的第n个孩子
+Node* get_child(Node* father, int n){
+    if(father == NULL){
+        printf("error: Father node is NULL!\n");
+        return NULL;
+    }
+    Node* target_node = father -> first_child;
+    while((target_node != NULL) && n>0){
+        n--;
+        target_node = target_node -> next_sib;
+    }
+    if(target_node == NULL){
+        printf("error: No such child!\n");
+    }
+    return target_node;
+}
+

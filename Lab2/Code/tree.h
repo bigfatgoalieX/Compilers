@@ -66,4 +66,6 @@ void addchild(Node* father, int children_cnt, ...);
 Node *flex_create_node(NodeType type, char* type_name, int line);
 
 void preorder_traversal_AST(Node* root);
+
+Node* get_child(Node* father, int n);
 #endif

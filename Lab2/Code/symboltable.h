@@ -28,4 +28,10 @@ typedef struct SymbolTableNode{
     struct SymbolTableNode* next;
 }STNode;
 
+
+
+
+STNode* findSymbol(char* name);
+void insertSymbol(char* name, struct Type* type);
+unsigned int hash_pjw(char* name);
 #endif

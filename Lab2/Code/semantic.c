@@ -1,6 +1,5 @@
 #include "semantic.h"
 
-
 // Program -> ExtDefList
 // ExtDefList -> ExtDef ExtDefList | ε
 // ExtDef -> Specifier ExtDecList SEMI | Specifier SEMI | Specifier FunDec CompSt
@@ -111,52 +110,88 @@ void ExtDecList_check(struct ASTNode* node){
     }
 }
 
-void Specifier_check(struct ASTNode* node){
+struct Type* Specifier_check(struct ASTNode* node){
     // Specifier -> TYPE | StructSpecifier
     if(node == NULL){
         return;
     }
+
     struct ASTNode* tmp_child = get_child(node, 0);
+
+    struct Type* type = (struct Type*)malloc(sizeof(struct Type));
+
     if(strcmp(tmp_child->type_name, "TYPE") == 0){
-        // do nothing
+        type->kind = BASIC;
+        if(strcmp(tmp_child->data.stringval, "int") == 0){
+            type->u.basic = 0;
+        }else{
+            type->u.basic = 1;
+        }
     }else{
-        StructSpecifier_check(tmp_child);
+        type = StructSpecifier_check(tmp_child);
     }
+
+    return type;
 }
 
-void StructSpecifier_check(struct ASTNode* node){
+struct Type* StructSpecifier_check(struct ASTNode* node){
     // StructSpecifier  -> STRUCT OptTag LC DefList RC | STRUCT Tag
     if(node == NULL){
         return;
     }
     struct ASTNode* tmp_child = get_child(node, 0);
+
+    struct Type* type = (struct Type*)malloc(sizeof(struct Type));
+    struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
+
     if(strcmp(tmp_child->type_name, "STRUCT") == 0){
+        type -> kind = STRUCTURE;
         struct ASTNode* tmp_child2 = get_child(node, 1);
         if(strcmp(tmp_child2->type_name, "OptTag") == 0){
-            OptTag_check(tmp_child2);
-            DefList_check(get_child(node, 3));
+            // also need to insert the symbol into the symboltable
+            structure -> name = OptTag_check(tmp_child2);
+            structure -> type = DefList_check(get_child(node, 3));
+            type -> u.structure = structure;
         }
         else{
-            Tag_check(get_child(node, 1));
+            // find the symbol in the symboltable
+            STNode* stnode = findSymbol(Tag_check(get_child(node, 1)));
+            if(stnode != NULL){
+                type = stnode -> type;
+            }
         }
     }
     else{
         printf("error: at StructSpecifier_check\n");
     }
+
+    return type;
 }
 
-void OptTag_check(struct ASTNode* node){
+char* OptTag_check(struct ASTNode* node){
     // OptTag -> ID | ε 
     if(node == NULL){
         return;
     }
+
+    char* name = (char*)malloc(sizeof(char)*32);
+    if(get_child(node, 0) == NULL){
+        printf("there is an anonymous struct\n");
+        return NULL;
+    }
+    name = get_child(node, 0) -> data.stringval;
+    return name;
 }
 
-void Tag_check(struct ASTNode* node){
+char* Tag_check(struct ASTNode* node){
     // Tag -> ID
     if(node == NULL){
         return;
     }
+
+    char* name = (char*)malloc(sizeof(char)*32);
+    name = get_child(node, 0)->data.stringval;
+    return name;
 }
 
 void VarDec_check(struct ASTNode* node){
@@ -337,5 +372,16 @@ void Exp_check(struct ASTNode* node){
     }
 }
 
+void Args_check(struct ASTNode* node){
+    // Args -> Exp COMMA Args | Exp
+    if(node == NULL){
+        return;
+    }
+    Exp_check(get_child(node, 0));
+    struct ASTNode* tmp_child = get_child(node, 1);
+    if(strcmp(tmp_child->type_name, "COMMA") == 0){
+        Args_check(get_child(node, 2));
+    }
+}
 
 

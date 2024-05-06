@@ -121,7 +121,8 @@ void ExtDecList_check(struct ASTNode* node, struct Type* type){
     VarDec_check(get_child(node, 0),type);
 
     struct ASTNode* tmp_child = get_child(node, 1);
-    if(strcmp(tmp_child->type_name, "COMMA") == 0){
+    // 注意检查空指针！
+    if(tmp_child != NULL && strcmp(tmp_child->type_name, "COMMA") == 0){
         ExtDecList_check(get_child(node, 2),type);
     }
 }
@@ -161,7 +162,7 @@ struct Type* StructSpecifier_check(struct ASTNode* node){
 
     struct Type* type = (struct Type*)malloc(sizeof(struct Type));
     struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
-    
+
     // 如果一个指向结构体的指针，结构体内部还有指针，则内部指针另外需要初始化分配空间
     structure -> type = (struct Type*)malloc(sizeof(struct Type));
 
@@ -326,7 +327,8 @@ struct FieldList* VarList_check(struct ASTNode* node){
     struct ASTNode* tmp_child = get_child(node, 1);
 
     struct FieldList* tmp = (struct FieldList*)malloc(sizeof(struct FieldList));
-    if(strcmp(tmp_child->type_name, "COMMA") == 0){
+    //注意检查空指针
+    if(tmp_child != NULL && strcmp(tmp_child->type_name, "COMMA") == 0){
         tmp -> name = ParamDec_check(get_child(node, 0)) -> name;
         tmp -> type = ParamDec_check(get_child(node, 0)) -> type;
         tmp -> tail = VarList_check(get_child(node, 2));

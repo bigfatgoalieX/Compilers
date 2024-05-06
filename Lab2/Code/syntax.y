@@ -461,6 +461,7 @@ int main(int argc, char** argv)
         // printf("Syntax is correct\n");
         semantic_analysis(root);
         printSymbolTable();
+        printTypeTable();
     }
     return 0;
 }

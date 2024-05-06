@@ -37,5 +37,6 @@ STNode* findType(char* name);
 void insertSymbol(char* name, struct Type* type);
 void insertType(char* name, struct Type* type);
 void printSymbolTable();
+void printTypeTable();
 unsigned int hash_pjw(char* name);
 #endif

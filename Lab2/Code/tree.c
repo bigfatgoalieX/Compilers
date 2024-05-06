@@ -69,7 +69,7 @@ Node* get_child(Node* father, int n){
         target_node = target_node -> next_sib;
     }
     if(target_node == NULL){
-        printf("error: No such child!\n");
+        // printf("error: No such child!\n");
     }
     return target_node;
 }

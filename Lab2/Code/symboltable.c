@@ -4,12 +4,24 @@
 
 // global hashtable
 STNode* symbolTable[HASHSIZE] = {NULL};
-
+STNode* typeTable[HASHSIZE] = {NULL};
 
 // find a symbol in the symbol table
 STNode* findSymbol(char* name){
     unsigned int hashval = hash_pjw(name);
     STNode* p = symbolTable[hashval];
+    while(p != NULL){
+        if(strcmp(p->name, name) == 0){
+            return p;
+        }
+        p = p->next;
+    }
+    return NULL;
+}
+
+STNode* findType(char* name){
+    unsigned int hashval = hash_pjw(name);
+    STNode* p = typeTable[hashval];
     while(p != NULL){
         if(strcmp(p->name, name) == 0){
             return p;
@@ -28,6 +40,16 @@ void insertSymbol(char* name, struct Type* type){
     new_node->type = type;
     new_node->next = p;
     symbolTable[hashval] = new_node;
+}
+
+void insertType(char* name, struct Type* type){
+    unsigned int hashval = hash_pjw(name);
+    STNode* p = typeTable[hashval];
+    STNode* new_node = (STNode*)malloc(sizeof(STNode));
+    new_node->name = name;
+    new_node->type = type;
+    new_node->next = p;
+    typeTable[hashval] = new_node;
 }
 
 // hash function

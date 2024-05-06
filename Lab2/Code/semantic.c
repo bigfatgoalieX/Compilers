@@ -83,12 +83,23 @@ void ExtDef_check(struct ASTNode* node){
 
     if(strcmp(tmp_child->type_name, "Specifier") == 0){
         struct ASTNode* tmp_child2 = get_child(node, 1);
+
         if(strcmp(tmp_child2->type_name, "ExtDecList") == 0){
-            ExtDecList_check(tmp_child2);
-        }else if(strcmp(tmp_child2->type_name, "SEMI") == 0){
-            // do nothing
-        }else{
-            FunDec_check(tmp_child2);
+            struct type* type = Specifier_check(tmp_child);
+            ExtDecList_check(tmp_child2,type);
+        }
+        else if(strcmp(tmp_child2->type_name, "SEMI") == 0){
+            // add the struct into the typetable
+            if(Specifier_check(tmp_child) -> kind == STRUCTURE){
+                insertType(Specifier_check(tmp_child) -> u.structure -> name, Specifier_check(tmp_child));
+            }
+            else{
+                //do nothing
+            }
+        }
+        else{
+            struct type* type = Specifier_check(tmp_child);
+            FunDec_check(tmp_child2,type);
             CompSt_check(get_child(node, 2));
         }
     }
@@ -97,23 +108,23 @@ void ExtDef_check(struct ASTNode* node){
     }
 }
 
-void ExtDecList_check(struct ASTNode* node){
+void ExtDecList_check(struct ASTNode* node, struct Type* type){
     // ExtDecList -> VarDec | VarDec COMMA ExtDecList
     if(node == NULL){
         return;
     }
-    VarDec_check(get_child(node, 0));
+    VarDec_check(get_child(node, 0),type);
 
     struct ASTNode* tmp_child = get_child(node, 1);
     if(strcmp(tmp_child->type_name, "COMMA") == 0){
-        ExtDecList_check(get_child(node, 2));
+        ExtDecList_check(get_child(node, 2),type);
     }
 }
 
 struct Type* Specifier_check(struct ASTNode* node){
     // Specifier -> TYPE | StructSpecifier
     if(node == NULL){
-        return;
+        return NULL;
     }
 
     struct ASTNode* tmp_child = get_child(node, 0);
@@ -137,7 +148,7 @@ struct Type* Specifier_check(struct ASTNode* node){
 struct Type* StructSpecifier_check(struct ASTNode* node){
     // StructSpecifier  -> STRUCT OptTag LC DefList RC | STRUCT Tag
     if(node == NULL){
-        return;
+        return NULL;
     }
     struct ASTNode* tmp_child = get_child(node, 0);
 
@@ -150,12 +161,15 @@ struct Type* StructSpecifier_check(struct ASTNode* node){
         if(strcmp(tmp_child2->type_name, "OptTag") == 0){
             // also need to insert the symbol into the symboltable
             structure -> name = OptTag_check(tmp_child2);
-            structure -> type = DefList_check(get_child(node, 3));
+            // 由于我们设置DefList_check返回类型是FieldList*,所以type的两个域要分别填写
+            structure -> type->kind = STRUCTURE;
+            structure -> type->u.structure = DefList_check(get_child(node, 3));
+            structure -> tail = NULL;
             type -> u.structure = structure;
         }
         else{
             // find the symbol in the symboltable
-            STNode* stnode = findSymbol(Tag_check(get_child(node, 1)));
+            STNode* stnode = findType(Tag_check(get_child(node, 1)));
             if(stnode != NULL){
                 type = stnode -> type;
             }
@@ -171,7 +185,7 @@ struct Type* StructSpecifier_check(struct ASTNode* node){
 char* OptTag_check(struct ASTNode* node){
     // OptTag -> ID | ε 
     if(node == NULL){
-        return;
+        return NULL;
     }
 
     char* name = (char*)malloc(sizeof(char)*32);
@@ -186,7 +200,7 @@ char* OptTag_check(struct ASTNode* node){
 char* Tag_check(struct ASTNode* node){
     // Tag -> ID
     if(node == NULL){
-        return;
+        return NULL;
     }
 
     char* name = (char*)malloc(sizeof(char)*32);
@@ -194,7 +208,7 @@ char* Tag_check(struct ASTNode* node){
     return name;
 }
 
-void VarDec_check(struct ASTNode* node){
+void VarDec_check(struct ASTNode* node, struct Type* type){
     // VarDec -> ID | VarDec LB INT RB
     if(node == NULL){
         return;
@@ -202,48 +216,112 @@ void VarDec_check(struct ASTNode* node){
     struct ASTNode* tmp_child = get_child(node, 0);
     if(strcmp(tmp_child->type_name, "ID") == 0){
         // deal with ID here
-    }else{
-        VarDec_check(get_child(node, 0));
+        insertSymbol(tmp_child->data.stringval, type);
+    }
+    else{
         // deal with array here
+        insertSymbol(VarDec_name_check(tmp_child), VarDec_type_check(tmp_child, type));
     }
 }
 
-void FunDec_check(struct ASTNode* node){
+char* VarDec_name_check(struct ASTNode* node){
+    // VarDec -> ID | VarDec LB INT RB
+    if(node == NULL){
+        return NULL;
+    }
+    struct ASTNode* tmp_child = get_child(node, 0);
+    if(strcmp(tmp_child->type_name, "ID") == 0){
+        return tmp_child->data.stringval;
+    }
+    else{
+        return VarDec_name_check(get_child(node, 0));
+    }
+}
+
+struct Type* VarDec_type_check(struct ASTNode* node, struct Type* type){
+    // VarDec -> ID | VarDec LB INT RB
+    if(node == NULL){
+        return NULL;
+    }
+
+    struct ASTNode* tmp_child = get_child(node, 0);
+    if(strcmp(tmp_child->type_name, "ID") == 0){
+        // deal with ID here
+        return type;
+    }else{
+        // deal with array here
+        struct Type* type = (struct Type*)malloc(sizeof(struct Type));
+        type -> kind = ARRAY;
+        type -> u.array.elem = VarDec_type_check(tmp_child, type);
+        type -> u.array.size = get_child(node, 2)->data.intval;
+    }
+}
+
+void FunDec_check(struct ASTNode* node, struct Type* ret_type){
     // FunDec -> ID LP VarList RP | ID LP RP
     if(node == NULL){
         return;
     }
     struct ASTNode* tmp_child = get_child(node, 0);
+
     if(strcmp(tmp_child->type_name, "ID") == 0){
         // deal with function here
         struct ASTNode* tmp_child2 = get_child(node, 2);
+
         if(strcmp(tmp_child2->type_name, "VarList") == 0){
-            VarList_check(tmp_child2);
+            struct Type* type = (struct Type*)malloc(sizeof(struct Type));
+            type -> kind = FUNCTION;
+            type -> u.function.ret = ret_type;
+            type -> u.function.param = VarList_check(tmp_child2);
+            insertSymbol(tmp_child->data.stringval, type);
         }
-    }else{
+        else{
+            struct Type* type = (struct Type*)malloc(sizeof(struct Type));
+            type -> kind = FUNCTION;
+            type -> u.function.ret = ret_type;
+            type -> u.function.param = NULL;
+            insertSymbol(tmp_child->data.stringval, type);
+        }
+    }
+    else{
         printf("error: at FunDec_check\n");
     }
 }
 
-void VarList_check(struct ASTNode* node){
+struct FieldList* VarList_check(struct ASTNode* node){
     // VarList -> ParamDec COMMA VarList | ParamDec
     if(node == NULL){
         return;
     }
-    ParamDec_check(get_child(node, 0));
+    
     struct ASTNode* tmp_child = get_child(node, 1);
+    
+    struct FieldList* tmp = (struct FieldList*)malloc(sizeof(struct FieldList));
     if(strcmp(tmp_child->type_name, "COMMA") == 0){
-        VarList_check(get_child(node, 2));
+        tmp -> name = ParamDec_check(get_child(node, 0)) -> name;
+        tmp -> type = ParamDec_check(get_child(node, 0)) -> type;
+        tmp -> tail = VarList_check(get_child(node, 2));
     }
+    else{
+        tmp = ParamDec_check(get_child(node, 0));
+    }
+
+    return tmp;
 }
 
-void ParamDec_check(struct ASTNode* node){
+struct FieldList* ParamDec_check(struct ASTNode* node){
     // ParamDec -> Specifier VarDec
     if(node == NULL){
         return;
     }
-    Specifier_check(get_child(node, 0));
-    VarDec_check(get_child(node, 1));
+    struct FieldList* tmp = (struct FieldList*)malloc(sizeof(struct FieldList));
+    struct Type* type = Specifier_check(get_child(node, 0));
+
+    tmp -> name = VarDec_name_check(get_child(node, 1));
+    tmp -> type = VarDec_type_check(get_child(node, 1),type);
+    tmp -> tail = NULL;
+
+    return tmp;
 }
 
 void CompSt_check(struct ASTNode* node){
@@ -286,47 +364,73 @@ void Stmt_check(struct ASTNode* node){
     }
 }
 
-void DefList_check(struct ASTNode* node){
+struct FieldList* DefList_check(struct ASTNode* node){
     // DefList -> Def DefList | ε
     if(node == NULL){
-        return;
+        return NULL;
     }
-    Def_check(get_child(node, 0));
-    DefList_check(get_child(node, 1));
+    if(get_child(node, 0) == NULL){
+        printf("DefList is empty\n");
+        return NULL;
+    }
+    
+    struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
+    struct FieldList* tmp = Def_check(get_child(node, 0));
+    structure -> name = tmp -> name;
+    structure -> type = tmp -> type;
+    structure -> tail = DefList_check(get_child(node, 1));
+
+    return structure;
 }
 
-void Def_check(struct ASTNode* node){
+struct FieldList* Def_check(struct ASTNode* node){
     // Def -> Specifier DecList SEMI
     if(node == NULL){
-        return;
+        return NULL;
     }
-    Specifier_check(get_child(node, 0));
-    DecList_check(get_child(node, 1));
+    // struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
+    struct Type* type = Specifier_check(get_child(node, 0));
+    struct FieldList* tmp = DecList_check(get_child(node, 1), type);
+    // structure -> name = tmp -> name;
+    // structure -> type = type;
+    // structure -> tail = tmp;
+
+    return tmp;
 }
 
-void DecList_check(struct ASTNode* node){
+struct FieldList* DecList_check(struct ASTNode* node, struct Type* type){
     // DecList -> Dec | Dec COMMA DecList
     if(node == NULL){
-        return;
+        return NULL;
     }
-    Dec_check(get_child(node, 0));
-    struct ASTNode* tmp_child = get_child(node, 1);
-    if(strcmp(tmp_child->type_name, "COMMA") == 0){
-        DecList_check(get_child(node, 2));
+
+    struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
+    struct FieldList* tmp = Dec_check(get_child(node, 0), type);
+    structure -> name = tmp -> name;
+    structure -> type = tmp -> type;
+    // if-else here is actually unnecessary
+    if(strcmp(get_child(node, 1)->type_name, "COMMA") == 0){
+        structure -> tail = DecList_check(get_child(node, 2), type);
     }
+    else{
+        structure -> tail = NULL;
+    }
+
+    return structure;
 }
 
-void Dec_check(struct ASTNode* node){
+struct FieldList* Dec_check(struct ASTNode* node, struct Type* type){
     // Dec -> VarDec | VarDec ASSIGNOP Exp
     if(node == NULL){
-        return;
+        return NULL;
     }
-    struct ASTNode* tmp_child = get_child(node, 0);
-    if(strcmp(tmp_child->type_name, "VarDec") == 0){
-        VarDec_check(tmp_child);
-    }else{
-        // do nothing
-    }
+    struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
+    // fetch name and type separately from VarDec
+    structure -> name = VarDec_name_check(get_child(node, 0));
+    structure -> type = VarDec_type_check(get_child(node, 0),type);
+    structure -> tail = NULL;
+
+    return structure;
 }
 
 void Exp_check(struct ASTNode* node){

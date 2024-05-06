@@ -1,3 +1,4 @@
+// include guard
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
@@ -35,5 +36,6 @@ STNode* findSymbol(char* name);
 STNode* findType(char* name);
 void insertSymbol(char* name, struct Type* type);
 void insertType(char* name, struct Type* type);
+void printSymbolTable();
 unsigned int hash_pjw(char* name);
 #endif

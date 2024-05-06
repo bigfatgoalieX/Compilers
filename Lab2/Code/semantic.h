@@ -1,3 +1,7 @@
+//include "tree.h"
+#ifndef SEMANTIC_H
+#define SEMANTIC_H
+
 #include "tree.h"
 #include "symboltable.h"
 
@@ -31,3 +35,5 @@ struct FieldList* Dec_check(struct ASTNode* node, struct Type* type);
 
 void Exp_check(struct ASTNode* node);
 void Args_check(struct ASTNode* node);
+
+#endif

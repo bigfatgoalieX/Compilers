@@ -222,7 +222,7 @@ ID {LETTER_}({LETTER_}|{DIGIT})*
 {ID} {
     //init attribute for Terminals
     // printf("ID\n");
-    yylval.node = flex_create_node(ID_TYPE ,"ID_TYPE",yylineno);
+    yylval.node = flex_create_node(ID_TYPE ,"ID",yylineno);
     strcpy(yylval.node -> data.stringval, yytext); 
     return ID;
 }

@@ -458,8 +458,9 @@ int main(int argc, char** argv)
     yyrestart(f);
     yyparse();
     if(err_cnt == 0){
-        printf("Syntax is correct\n");
+        // printf("Syntax is correct\n");
         semantic_analysis(root);
+        printSymbolTable();
     }
     return 0;
 }

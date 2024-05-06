@@ -1,11 +1,13 @@
+// include guard
+#ifndef TREE_H
+#define TREE_H
+
 #include "stdio.h"
 #include "string.h"
 #include "stdarg.h"
 #include "stdlib.h"
 
-// macro to avoid redeclaration
-#ifndef TREE_H
-#define TREE_H
+
 
 typedef enum ASTNodeType{
     PROGRAM,
@@ -29,7 +31,7 @@ typedef enum ASTNodeType{
     DEC,
     EXP,
     ARGS,
-    // below are types for nodes that are not leaves   aka non-terminals
+    // above are types for nodes that are not leaves   aka non-terminals
     // below are types for the leaves    aka terminals            
     KEYWORD_PUNCTUATION, // ";", ",", "."
     KEYWORD_OPERATOR,    // "=", "+", "-", "*", "/", "||", "&&", "!"

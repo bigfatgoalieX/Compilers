@@ -52,6 +52,16 @@ void insertType(char* name, struct Type* type){
     typeTable[hashval] = new_node;
 }
 
+
+void printSymbolTable(){
+    for(int i = 0; i < HASHSIZE; i++){
+        STNode* p = symbolTable[i];
+        while(p != NULL){
+            printf("name: %s, type: %d\n", p->name, p->type->kind);
+            p = p->next;
+        }
+    }
+}
 // hash function
 unsigned int hash_pjw(char* name)
 {

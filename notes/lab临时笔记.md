@@ -64,4 +64,14 @@ struct FieldList* Dec_check(struct ASTNode* node, struct Type* type){
   }
   ```
 
+  ### ε陷阱
   
+  典型案例：
+  
+  ```css
+  CompSt -> LC DefList StmtList RC
+  DefList -> Def DefList | ε
+  StmtList -> Stmt StmtList | ε
+  ```
+  
+  打印出语法树观察发现，当为`ε`时候，不是先推出`DefList`再推出`ε`，而是直接没有那个结点！所以对于第一行式子我们有4种不同的情况需要处理。（因为当节点不存在时，`get_child`函数里面的参数也要改变）

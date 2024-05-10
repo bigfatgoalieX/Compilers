@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "intercode_gen.h": "c",
+        "intercode_utils.h": "c"
+    }
+}

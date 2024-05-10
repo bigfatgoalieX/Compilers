@@ -1,5 +1,7 @@
 #include "semantic.h"
 
+// #define DEBUG_MODE
+
 // Program -> ExtDefList
 // ExtDefList -> ExtDef ExtDefList | ε
 // ExtDef -> Specifier ExtDecList SEMI | Specifier SEMI | Specifier FunDec CompSt
@@ -51,7 +53,9 @@
 // Args -> Exp COMMA Args | Exp
 
 void semantic_analysis(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach semantic_analysis.\n");
+    #endif
     if(node == NULL){
         return;
     }
@@ -59,7 +63,9 @@ void semantic_analysis(struct ASTNode* node){
 }
 
 void Program_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Program_check.\n");
+    #endif
     // Program -> ExtDefList
     if(node == NULL){
         return;
@@ -68,7 +74,9 @@ void Program_check(struct ASTNode* node){
 }
 
 void ExtDefList_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach ExtDefList_check.\n");
+    #endif
     // ExtDefList -> ExtDef ExtDefList | ε
     if(node == NULL){
         return;
@@ -78,7 +86,9 @@ void ExtDefList_check(struct ASTNode* node){
 }
 
 void ExtDef_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach ExtDef_check.\n");
+    #endif
     // ExtDef -> Specifier ExtDecList SEMI | Specifier SEMI | Specifier FunDec CompSt
     if(node == NULL){
         return;
@@ -113,7 +123,9 @@ void ExtDef_check(struct ASTNode* node){
 }
 
 void ExtDecList_check(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach ExtDecList_check.\n");
+    #endif
     // ExtDecList -> VarDec | VarDec COMMA ExtDecList
     if(node == NULL){
         return;
@@ -128,16 +140,18 @@ void ExtDecList_check(struct ASTNode* node, struct Type* type){
 }
 
 struct Type* Specifier_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Specifier_check.\n");
+    #endif
     // Specifier -> TYPE | StructSpecifier
     if(node == NULL){
         return NULL;
     }
-
+    
     struct ASTNode* tmp_child = get_child(node, 0);
-
+    
     struct Type* type = (struct Type*)malloc(sizeof(struct Type));
-
+    
     if(strcmp(tmp_child->type_name, "TYPE") == 0){
         type->kind = BASIC;
         if(strcmp(tmp_child->data.stringval, "int") == 0){
@@ -153,7 +167,9 @@ struct Type* Specifier_check(struct ASTNode* node){
 }
 
 struct Type* StructSpecifier_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach StructSpecifier_check.\n");
+    #endif
     // StructSpecifier  -> STRUCT OptTag LC DefList RC | STRUCT Tag
     if(node == NULL){
         return NULL;
@@ -195,7 +211,9 @@ struct Type* StructSpecifier_check(struct ASTNode* node){
 }
 
 char* OptTag_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach OptTag_check.\n");
+    #endif
     // OptTag -> ID | ε 
     if(node == NULL){
         return NULL;
@@ -213,7 +231,9 @@ char* OptTag_check(struct ASTNode* node){
 }
 
 char* Tag_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Tag_check.\n");
+    #endif
     // Tag -> ID
     if(node == NULL){
         return NULL;
@@ -225,7 +245,9 @@ char* Tag_check(struct ASTNode* node){
 }
 
 void VarDec_check(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach VarDec_check.\n");
+    #endif
     // printSymbolTable();
     // VarDec -> ID | VarDec LB INT RB
     if(node == NULL){
@@ -247,7 +269,9 @@ void VarDec_check(struct ASTNode* node, struct Type* type){
 }
 
 char* VarDec_name_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach VarDec_name_check.\n");
+    #endif
     // VarDec -> ID | VarDec LB INT RB
     if(node == NULL){
         return NULL;
@@ -262,7 +286,9 @@ char* VarDec_name_check(struct ASTNode* node){
 }
 
 struct Type* VarDec_type_check(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach VarDec_type_check.\n");
+    #endif
     // VarDec -> ID | VarDec LB INT RB
     if(node == NULL){
         return NULL;
@@ -285,7 +311,10 @@ struct Type* VarDec_type_check(struct ASTNode* node, struct Type* type){
 }
 
 void FunDec_check(struct ASTNode* node, struct Type* ret_type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach FunDec_check.\n");
+    #endif
+    // printf("debuginfo: function name: %s\n", get_child(node, 0)->data.stringval);
     // FunDec -> ID LP VarList RP | ID LP RP
     if(node == NULL){
         return;
@@ -295,7 +324,6 @@ void FunDec_check(struct ASTNode* node, struct Type* ret_type){
     if(strcmp(tmp_child->type_name, "ID") == 0){
         // deal with function here
         struct ASTNode* tmp_child2 = get_child(node, 2);
-
         if(strcmp(tmp_child2->type_name, "VarList") == 0){
             struct Type* type = (struct Type*)malloc(sizeof(struct Type));
             type -> kind = FUNCTION;
@@ -318,7 +346,9 @@ void FunDec_check(struct ASTNode* node, struct Type* ret_type){
 }
 
 struct FieldList* VarList_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach VarList_check.\n");
+    #endif
     // VarList -> ParamDec COMMA VarList | ParamDec
     if(node == NULL){
         return NULL;
@@ -341,7 +371,9 @@ struct FieldList* VarList_check(struct ASTNode* node){
 }
 
 struct FieldList* ParamDec_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach ParamDec_check.\n");
+    #endif
     // ParamDec -> Specifier VarDec
     if(node == NULL){
         return NULL;
@@ -357,18 +389,37 @@ struct FieldList* ParamDec_check(struct ASTNode* node){
 }
 
 void CompSt_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach CompSt_check.\n");
+    #endif
     // CompSt -> LC DefList StmtList RC
     if(node == NULL){
         return;
     }
-    DefList_check_easy(get_child(node, 1));
-    // printf("###\n");
-    StmtList_check(get_child(node, 2));
+    // 注意语法树上可能根本没有DefList结点,也可能没有StmtList结点！！！
+    // 故此处需要额外判断，一共是2*2 = 4种情况！！！
+    struct ASTNode* tmp_child = get_child(node,1);
+    if(strcmp(tmp_child -> type_name, "DefList") == 0){
+        DefList_check_easy(get_child(node, 1));
+        if(strcmp(get_child(node, 2) -> type_name, "StmtList") == 0){
+            StmtList_check(get_child(node, 2));
+        }
+        else{
+            // do nothing
+        }
+    }
+    else if(strcmp(tmp_child -> type_name, "StmtList") == 0){
+        StmtList_check(get_child(node, 1));
+    }
+    else{
+        // do nothing
+    }
 }
 
 void StmtList_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach StmtList_check.\n");
+    #endif
     // StmtList -> Stmt StmtList | ε
     if(node == NULL){
         return;
@@ -378,7 +429,9 @@ void StmtList_check(struct ASTNode* node){
 }
 
 void Stmt_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Stmt_check.\n");
+    #endif
     // Stmt -> Exp SEMI | CompSt | RETURN Exp SEMI | IF LP Exp RP Stmt
     // | IF LP Exp RP Stmt ELSE Stmt | WHILE Lp Exp RP Stmt
     if(node == NULL){
@@ -401,7 +454,9 @@ void Stmt_check(struct ASTNode* node){
 }
 
 void DefList_check_easy(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach DefList_check_easy.\n");
+    #endif
     // DefList -> Def DefList | ε
     if(node == NULL){
         return;
@@ -419,13 +474,17 @@ void DefList_check_easy(struct ASTNode* node){
 }
 
 void Def_check_easy(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Def_check_easy.\n");
+    #endif
     // Def -> Specifier DecList SEMI
     if(node == NULL){
         return;
     }
     // struct FieldList* structure = (struct FieldList*)malloc(sizeof(struct FieldList));
+    
     struct Type* type = Specifier_check(get_child(node, 0));
+
     DecList_check_easy(get_child(node, 1), type);
     // structure -> name = tmp -> name;
     // structure -> type = tmp -> type;
@@ -436,7 +495,9 @@ void Def_check_easy(struct ASTNode* node){
 }
 
 void DecList_check_easy(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach DecList_check_easy.\n");
+    #endif
     // DecList -> Dec | Dec COMMA DecList
     if(node == NULL){
         return;
@@ -458,7 +519,9 @@ void DecList_check_easy(struct ASTNode* node, struct Type* type){
 }
 
 void Dec_check_easy(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Dec_check_easy.\n");
+    #endif
     // Dec -> VarDec | VarDec ASSIGNOP Exp
     if(node == NULL){
         return;
@@ -469,7 +532,9 @@ void Dec_check_easy(struct ASTNode* node, struct Type* type){
 }
 
 struct FieldList* DefList_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach DefList_check.\n");
+    #endif
     // DefList -> Def DefList | ε
     if(node == NULL){
         return NULL;
@@ -489,7 +554,9 @@ struct FieldList* DefList_check(struct ASTNode* node){
 }
 
 struct FieldList* Def_check(struct ASTNode* node){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Def_check.\n");
+    #endif
     // Def -> Specifier DecList SEMI
     if(node == NULL){
         return NULL;
@@ -505,7 +572,9 @@ struct FieldList* Def_check(struct ASTNode* node){
 }
 
 struct FieldList* DecList_check(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach DecList_check.\n");
+    #endif
     // DecList -> Dec | Dec COMMA DecList
     if(node == NULL){
         return NULL;
@@ -527,7 +596,9 @@ struct FieldList* DecList_check(struct ASTNode* node, struct Type* type){
 }
 
 struct FieldList* Dec_check(struct ASTNode* node, struct Type* type){
+    #ifdef DEBUG_MODE
     printf("debuginfo: reach Dec_check.\n");
+    #endif
     // Dec -> VarDec | VarDec ASSIGNOP Exp
     if(node == NULL){
         return NULL;

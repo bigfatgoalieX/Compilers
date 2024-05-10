@@ -1,22 +1,20 @@
 // include guard
-#ifndef INTERMEDIATE_CODE
-#define INTERMEDIATE_CODE
+#ifndef INTERCODE_UTILS
+#define INTERCODE_UTILS
 
 #include "semantic.h"
 struct Operand{
     enum{
-        VARIABLE_OPERAND, // variable
+        VARIABLE_OPERAND, // variable v1, v2, v3, ...
         CONSTANT_OPERAND, // constant
         FUNCTION_OPERAND, // function   
-        ADDRESS_OPERAND,  // &variable
         TEMPVAR_OPERAND,  // t1, t2, t3, ...
         LABEL_OPERAND     // label1, label2, label3, ...
     }kind;
     union{
-        char* var_name; // variable name
+        int var_no; // variable name
         int constant_value;  // constant value
         char* func_name; // function name
-        struct Operand* addr; // address ???
         int temp_no; // temporary variable number
         int label_no; // label number
     }u;
@@ -49,9 +47,9 @@ struct InterCode{
     }kind;
     union{
         struct{struct Operand* result;}unary;
-        struct{struct Operand* left, right;}binary;
-        struct{struct Operand* result, op1, op2;}ternary;
-        struct{struct Operand* op1, op2, op3; char* relop;}quaternary;
+        struct{struct Operand* left, *right;}binary;
+        struct{struct Operand* result, *op1, *op2;}ternary;
+        struct{struct Operand* op1, *op2, *op3; char* relop;}quaternary;
     }u;
 };
 
@@ -62,8 +60,11 @@ struct InterCodeNode{
     struct InterCodeNode* next;
 };
 
-// function to generate intermediate code based on syntax analysis and semantic analysis
-void generate_InterCode(struct ASTNode* root);
+struct Operand* Operand_Init(int kind, ...);
+struct InterCode* InterCode_Init(int kind, int operand_no, ...);
+void InsertInterCodeNode(struct InterCode* code);
+void fPrintInterCode(FILE* fp);
+
 
 
 

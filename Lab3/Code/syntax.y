@@ -5,6 +5,7 @@
 #include "lex.yy.c"
 #include "tree.h"
 #include "semantic.h"
+#include "intercode_gen.h"
 
 // extern struct ASTNode;
 Node *root; //the root of the AST
@@ -198,11 +199,11 @@ FunDec:ID LP VarList RP{
     };
     
 VarList: ParamDec COMMA VarList{
-    $$ = bison_create_node(VARLIST,"Varlist");
+    $$ = bison_create_node(VARLIST,"VarList");
     addchild($$,3,$1,$2,$3);
     };
     | ParamDec{
-        $$ = bison_create_node(VARLIST,"Varlist");
+        $$ = bison_create_node(VARLIST,"VarList");
         addchild($$,1,$1);
     };
     
@@ -449,19 +450,31 @@ Args: Exp COMMA Args{
 int main(int argc, char** argv)
 {
     if (argc <= 1) return 1;
+
     FILE* f = fopen(argv[1], "r");
     if (!f)
     {
     perror(argv[1]);
     return 1;
     }
+
+    FILE* f2 = fopen(argv[2], "w");
+    if (!f2)
+    {
+    perror(argv[2]);
+    return 1;
+    }
+
     yyrestart(f);
     yyparse();
     if(err_cnt == 0){
         // printf("Syntax is correct\n");
+        // preorder_traversal_AST(root);
         semantic_analysis(root);
-        printSymbolTable();
-        printTypeTable();
+        // printf("debuginfo: semantic analysis finished\n");
+        // printSymbolTable();
+        // printTypeTable();
+        generate_InterCode(root,f2);
     }
     return 0;
 }
